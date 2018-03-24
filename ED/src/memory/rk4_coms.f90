@@ -11,6 +11,7 @@ module rk4_coms
    use ed_max_dims, only : n_pft   & ! intent(in)
                          , nzgmax  & ! intent(in)
                          , str_len ! ! intent(in)
+   use hydr_state_vars,   only : hydr_vars
 
    implicit none
 
@@ -178,7 +179,12 @@ module rk4_coms
       real(kind=8), pointer, dimension(:) :: gsw_closed      ! Sto. cond. (cl.) [  kg/m�/s]
       real(kind=8), pointer, dimension(:) :: rshort_l        ! Absorbed SWRad.  [   J/m�/s]
       real(kind=8), pointer, dimension(:) :: rlong_l         ! Absorbed LWRad.  [   J/m�/s]
+      
+      type(hydr_vars) :: hydr
+
       !------------------------------------------------------------------------------------!
+
+      
 
 
       !----- Wood (cohort-level) variables. -----------------------------------------------!
@@ -1138,6 +1144,7 @@ module rk4_coms
    !---------------------------------------------------------------------------------------!
 
    subroutine allocate_rk4_coh(maxcohort,y)
+     use hydr_state_vars, only : hydr_allocate
       implicit none
       !----- Arguments --------------------------------------------------------------------!
       type(rk4patchtype) , target     :: y
@@ -1230,6 +1237,7 @@ module rk4_coms
       allocate(y%avg_wshed_lg      (maxcohort))
       allocate(y%avg_wshed_wg      (maxcohort))
 
+      call hydr_allocate(y%hydr,maxcohort)
 
       call zero_rk4_cohort(y)
 
@@ -1353,6 +1361,7 @@ module rk4_coms
    !    This subroutine will initialize the cohort variables with zeroes.                  !
    !---------------------------------------------------------------------------------------!
    subroutine zero_rk4_cohort(y)
+     use hydr_state_vars, only: hydr_zero_vars
       implicit none
       !----- Arguments --------------------------------------------------------------------!
       type(rk4patchtype), target :: y
@@ -1442,6 +1451,8 @@ module rk4_coms
       if(associated(y%avg_wshed_lg      )) y%avg_wshed_lg       = 0.d0
       if(associated(y%avg_wshed_wg      )) y%avg_wshed_wg       = 0.d0
 
+      if(allocated(y%hydr%water_mass_xy_sm)) call hydr_zero_vars(y%hydr)
+
       return
    end subroutine zero_rk4_cohort
    !=======================================================================================!
@@ -1457,6 +1468,7 @@ module rk4_coms
    !    This subroutine will deallocate the cohorts of the temporary patch.                !
    !---------------------------------------------------------------------------------------!
    subroutine deallocate_rk4_coh(y)
+     use hydr_state_vars, only : hydr_deallocate    
       implicit none
       !----- Arguments --------------------------------------------------------------------!
       type(rk4patchtype), target :: y
@@ -1547,6 +1559,9 @@ module rk4_coms
       if(associated(y%avg_intercepted_aw)) deallocate(y%avg_intercepted_aw)
       if(associated(y%avg_wshed_lg      )) deallocate(y%avg_wshed_lg      )
       if(associated(y%avg_wshed_wg      )) deallocate(y%avg_wshed_wg      )
+
+      if(allocated(y%hydr%water_mass_xy_sm)) call hydr_deallocate(y%hydr)
+
       return
    end subroutine deallocate_rk4_coh
    !=======================================================================================!

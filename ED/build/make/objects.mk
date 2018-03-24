@@ -75,6 +75,12 @@ OBJ_MODEL =                        \
 	hdf5_coms.o                \
 	hdf5_utils.o               \
 	heun_driver.o              \
+	hydr_consts_coms.o         \
+	hydr_init.o                \
+	hydr_coupler.o             \
+	hydr_derivs.o              \
+	hydr_rk4.o                 \
+	hydr_state_vars.o          \
 	hybrid_driver.o            \
 	hydrology_coms.o           \
 	hydrology_constants.o      \

@@ -333,6 +333,36 @@ hybrid_driver.o : $(ED_DYNAMICS)/hybrid_driver.f90
 	/bin/cp -f $< $(<F:.f90=.f90)
 	$(F90_COMMAND) $(<F:.f90=.f90)
 
+hydr_consts_coms.o : $(ED_MEMORY)/hydr_consts_coms.f90
+	/bin/rm -f $(<F:.f90=.f90)
+	/bin/cp -f $< $(<F:.f90=.f90)
+	$(F90_COMMAND) $(<F:.f90=.f90)
+
+hydr_coupler.o: $(ED_DYNAMICS)/hydr_coupler.f90
+	/bin/rm -f $(<F:.f90=.f90)
+	/bin/cp -f $< $(<F:.f90=.f90)
+	$(F90_COMMAND) $(<F:.f90=.f90)
+
+hydr_derivs.o: $(ED_DYNAMICS)/hydr_derivs.f90
+	/bin/rm -f $(<F:.f90=.f90)
+	/bin/cp -f $< $(<F:.f90=.f90)
+	$(F90_COMMAND) $(<F:.f90=.f90)
+
+hydr_init.o: $(ED_INIT)/hydr_init.f90
+	/bin/rm -f $(<F:.f90=.f90)
+	/bin/cp -f $< $(<F:.f90=.f90)
+	$(F90_COMMAND) $(<F:.f90=.f90)
+
+hydr_rk4.o: $(ED_DYNAMICS)/hydr_rk4.f90
+	/bin/rm -f $(<F:.f90=.f90)
+	/bin/cp -f $< $(<F:.f90=.f90)
+	$(F90_COMMAND) $(<F:.f90=.f90)
+
+hydr_state_vars.o: $(ED_MEMORY)/hydr_state_vars.f90
+	/bin/rm -f $(<F:.f90=.f90)
+	/bin/cp -f $< $(<F:.f90=.f90)
+	$(F90_COMMAND) $(<F:.f90=.f90)
+
 hydrology_coms.o: $(ED_MEMORY)/hydrology_coms.f90
 	/bin/rm -f $(<F:.f90=.f90)
 	/bin/cp -f $< $(<F:.f90=.f90)

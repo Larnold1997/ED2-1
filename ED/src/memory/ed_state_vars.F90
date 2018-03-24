@@ -48,6 +48,9 @@ module ed_state_vars
                                  , history_eorq      & ! intent(in)
                                  , ndcycle           ! ! intent(in)
 
+
+   use hydr_state_vars,     only : hydr_vars
+
    implicit none
    !=======================================================================================!
    !=======================================================================================!
@@ -372,6 +375,9 @@ module ed_state_vars
 
       real , pointer, dimension(:,:) :: mort_rate
       !<Mortality rate (yr-1)
+
+      type(hydr_vars) :: hydr
+      ! This type holds the hydraulics information
 
       integer ,pointer,dimension(:) :: krdepth
       !<This specifies the index of the deepest soil layer of which the 
@@ -4661,6 +4667,7 @@ module ed_state_vars
    !> \brief   Allocates the cohort-level variables.
    !---------------------------------------------------------------------------------------!
    subroutine allocate_patchtype(cpatch,ncohorts)
+      use hydr_state_vars, only : hydr_allocate
 
       implicit none
 
@@ -4767,6 +4774,8 @@ module ed_state_vars
       allocate(cpatch%monthly_dndt                 (                    ncohorts))
       allocate(cpatch%monthly_dlnndt               (                    ncohorts))
       allocate(cpatch%mort_rate                    (             n_mort,ncohorts))
+
+      call hydr_allocate(cpatch%hydr,                                   ncohorts)
 
       allocate(cpatch%krdepth                      (                    ncohorts))
       allocate(cpatch%first_census                 (                    ncohorts))
@@ -7519,6 +7528,8 @@ module ed_state_vars
    !---------------------------------------------------------------------------------------!
    subroutine deallocate_patchtype(cpatch)
 
+      use hydr_state_vars, only : hydr_deallocate
+
       implicit none
 
       !----- Arguments. -------------------------------------------------------------------!
@@ -7843,6 +7854,11 @@ module ed_state_vars
       if(associated(cpatch%mmean_broot         )) deallocate(cpatch%mmean_broot         )
       if(associated(cpatch%mmean_bstorage      )) deallocate(cpatch%mmean_bstorage      )
       if(associated(cpatch%mmean_mort_rate     )) deallocate(cpatch%mmean_mort_rate     )
+      
+      if(allocated(cpatch%hydr%water_mass_xy_sm)) then
+	call hydr_deallocate(cpatch%hydr)
+      endif
+
       if(associated(cpatch%mmean_leaf_maintenance))                                        &
                                                 deallocate(cpatch%mmean_leaf_maintenance)
       if(associated(cpatch%mmean_root_maintenance))                                        &
@@ -9385,6 +9401,7 @@ module ed_state_vars
    !>          allocated, so this should be never used in a previously allocated patch.
    !---------------------------------------------------------------------------------------!
    subroutine copy_patchtype(ipatch,opatch,icoa,icoz,ocoa,ocoz)
+      use hydr_state_vars, only: copy_hydrtype
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
       type(patchtype)         , target     :: ipatch
@@ -10025,6 +10042,8 @@ module ed_state_vars
    !---------------------------------------------------------------------------------------!
 
    subroutine copy_patchtype_mask(ipatch,opatch,lmask,isize,osize)
+      use hydr_state_vars, only: copy_hydrtype_mask
+
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
       type(patchtype)         , target     :: ipatch
@@ -23880,6 +23899,7 @@ module ed_state_vars
       use ed_var_tables, only : vtable_edio_r & ! sub-routine
                               , vtable_edio_i & ! sub-routine
                               , metadata_edio ! ! sub-routine
+      use hydr_state_vars, only: filltab_hydrtype
 
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
