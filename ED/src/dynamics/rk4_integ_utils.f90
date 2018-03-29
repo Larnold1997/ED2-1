@@ -2243,6 +2243,8 @@ end subroutine initialize_misc_stepvars
       use grid_coms             , only : nzg                   ! ! intent(in)
       !$ use omp_lib
 
+      use hydr_rk4, only: hydr_rk4_sanity
+
       implicit none
       !----- Arguments --------------------------------------------------------------------!
       type(rk4patchtype) , target      :: y
@@ -2890,6 +2892,8 @@ end subroutine initialize_misc_stepvars
          write(unit=*,fmt='(78a)')         ('=',k=1,78)
          write(unit=*,fmt='(a)')           ' '
       end if
+
+      call hydr_rk4_sanity(y%hydr, cpatch%ncohorts, reject_step)
 
       return
    end subroutine rk4_sanity_check
