@@ -13,6 +13,10 @@ subroutine leaf_derivs(initp,dinitp,csite,ipa,dt,is_hybrid)
    use ed_state_vars          , only : sitetype           & ! structure
                                      , polygontype        ! ! structure
    use grid_coms              , only : nzg                ! ! intent(in)
+  
+   use hydr_derivs, only : hydr_derivs_master
+   use hydr_coupler, only: hydr_root_water_extract
+
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(rk4patchtype) , target     :: initp     ! Structure with RK4 intermediate state
@@ -60,6 +64,19 @@ subroutine leaf_derivs(initp,dinitp,csite,ipa,dt,is_hybrid)
 
    !----- Find the derivatives. -----------------------------------------------------------!
    call leaftw_derivs(nzg,initp,dinitp,csite,ipa,dt,is_hybrid)
+   call hydr_derivs_master(initp%hydr, dinitp%hydr, &
+	csite%patch(ipa)%ncohorts, real(initp%can_temp), initp%fs_open, &
+	dinitp%psi_open, dinitp%psi_closed, &
+	csite%patch(ipa)%pft, initp%gpp, initp%leaf_resp, csite%patch(ipa)%nplant, &
+	initp%transp)
+   call hydr_root_water_extract(csite%ntext_soil(:,ipa), initp%soil_water, &
+	initp%soil_fracliq, csite%patch(ipa)%ncohorts, &
+	csite%patch(ipa)%krdepth, csite%patch(ipa)%crown_area, &
+	csite%patch(ipa)%nplant, csite%patch(ipa)%broot, &
+	csite%patch(ipa)%pft, dinitp%soil_water, dinitp%soil_energy, &
+	initp%soil_tempk, initp%hydr%water_root_uptake)
+	
+	
    !---------------------------------------------------------------------------------------!
 
    return
