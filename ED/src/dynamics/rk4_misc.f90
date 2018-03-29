@@ -41,6 +41,9 @@ subroutine copy_patch_init(sourcesite,ipa,targetp,vels)
    use canopy_air_coms       , only : ubmin8
    use canopy_struct_dynamics, only : canopy_turbulence8     ! ! subroutine
    !$ use omp_lib
+  
+   use hydr_state_vars, only: copy_hydrtype
+   
    implicit none
 
    !----- Arguments -----------------------------------------------------------------------!
@@ -612,6 +615,9 @@ subroutine update_diagnostic_vars(initp, csite,ipa)
    use ed_therm_lib          , only : ed_grndvap8           ! ! subroutine
    use physiology_coms       , only : plant_hydro_scheme    ! ! intent(in)
    !$ use omp_lib
+
+   use hydr_coupler, only: hydr_diag_coupler
+
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(rk4patchtype) , target     :: initp
@@ -1293,6 +1299,7 @@ subroutine update_diagnostic_vars(initp, csite,ipa)
    end if
    !---------------------------------------------------------------------------------------!
 
+   call hydr_diag_coupler(csite,ipa,initp%hydr,real(initp%can_temp), real(initp%soil_water), ntxt)
 
    return
 end subroutine update_diagnostic_vars
