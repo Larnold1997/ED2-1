@@ -36,6 +36,9 @@ module rk4_driver
       use budget_utils           , only : update_budget        & ! function
                                         , compute_budget       ! ! function
       !$ use omp_lib
+     
+      use hydr_state_vars, only: copy_hydrtype
+
       implicit none
 
       !----- Arguments --------------------------------------------------------------------!
