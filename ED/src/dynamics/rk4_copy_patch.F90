@@ -19,6 +19,8 @@ subroutine copy_rk4_patch(sourcep, targetp, cpatch)
    use ed_max_dims   , only : n_pft             ! ! intent(in)
    use ed_misc_coms  , only : fast_diagnostics  ! ! intent(in)
 
+   use hydr_state_vars, only: copy_hydrtype
+
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(rk4patchtype) , target     :: sourcep
