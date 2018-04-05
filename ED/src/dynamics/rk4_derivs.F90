@@ -9,7 +9,7 @@
 !------------------------------------------------------------------------------------------!
 subroutine leaf_derivs(initp,dinitp,csite,ipa,dt,is_hybrid)
 
-   use rk4_coms               , only : rk4patchtype       ! ! structure
+   use rk4_coms               , only : rk4patchtype, rk4site       ! ! structure
    use ed_state_vars          , only : sitetype           & ! structure
                                      , polygontype        ! ! structure
    use grid_coms              , only : nzg                ! ! intent(in)
@@ -69,7 +69,7 @@ subroutine leaf_derivs(initp,dinitp,csite,ipa,dt,is_hybrid)
 	dinitp%psi_open, dinitp%psi_closed, &
 	csite%patch(ipa)%pft, initp%gpp, initp%leaf_resp, csite%patch(ipa)%nplant, &
 	initp%transp)
-   call hydr_root_water_extract(csite%ntext_soil(:,ipa), initp%soil_water, &
+   call hydr_root_water_extract(rk4site%ntext_soil, initp%soil_water, &
 	initp%soil_fracliq, csite%patch(ipa)%ncohorts, &
 	csite%patch(ipa)%krdepth, csite%patch(ipa)%crown_area, &
 	csite%patch(ipa)%nplant, csite%patch(ipa)%broot, &
@@ -1487,26 +1487,26 @@ subroutine canopy_derivs_two(mzg,initp,dinitp,csite,ipa,hflxsc,wflxsc,qwflxsc,hf
                   dinitp%psi_open  (ico) = gleaf_open   * shv_gradient
                   dinitp%psi_closed(ico) = gleaf_closed * shv_gradient
 
-                  transp = initp%lai(ico) * ( initp%fs_open(ico) * dinitp%psi_open(ico)    &
+                  initp%transp(ico) = initp%lai(ico) * ( initp%fs_open(ico) * dinitp%psi_open(ico)    &
                                             + (1.0d0 - initp%fs_open(ico))                 &
                                             * dinitp%psi_closed(ico) )
                else
                   dinitp%psi_open(ico)   = 0.d0
                   dinitp%psi_closed(ico) = 0.d0
-                  transp                 = 0.d0
+                  initp%transp(ico)                 = 0.d0
                end if
                !---------------------------------------------------------------------------!
                !    Only liquid water is transpired, thus this is always the condensation  !
                ! latent heat.                                                              !
                !---------------------------------------------------------------------------!
-               qtransp = transp * tq2enthalpy8(initp%leaf_temp(ico),1.d0,.true.)
+               qtransp = initp%transp(ico) * tq2enthalpy8(initp%leaf_temp(ico),1.d0,.true.)
                !---------------------------------------------------------------------------!
 
             else
                !----- Canopy is already saturated, no evapotranspiration is allowed. ------!
                wflxlc                 = 0.d0
                qwflxlc                = 0.d0
-               transp                 = 0.d0
+               initp%transp(ico)                 = 0.d0
                qtransp                = 0.d0
                dinitp%psi_open(ico)   = 0.d0
                dinitp%psi_closed(ico) = 0.d0
@@ -1520,7 +1520,7 @@ subroutine canopy_derivs_two(mzg,initp,dinitp,csite,ipa,hflxsc,wflxsc,qwflxsc,hf
             !------------------------------------------------------------------------------!
             wflxlc                 = wflxlc_try
             qwflxlc                = wflxlc * tq2enthalpy8(initp%leaf_temp(ico),1.d0,.true.)
-            transp                 = 0.0d0
+            initp%transp(ico)                 = 0.0d0
             qtransp                = 0.0d0
             dinitp%psi_open  (ico) = 0.0d0
             dinitp%psi_closed(ico) = 0.0d0
@@ -1534,7 +1534,7 @@ subroutine canopy_derivs_two(mzg,initp,dinitp,csite,ipa,hflxsc,wflxsc,qwflxsc,hf
 
 
          !----- We need to extract water from the soil equal to the transpiration. --------!
-         rk4aux(ibuff)%extracted_water(ico,kroot) = transp                                 &
+         rk4aux(ibuff)%extracted_water(ico,kroot) = initp%transp(ico)                                 &
                                                   + rk4aux(ibuff)%extracted_water(ico,kroot)
          !---------------------------------------------------------------------------------!
 
@@ -1569,7 +1569,7 @@ subroutine canopy_derivs_two(mzg,initp,dinitp,csite,ipa,hflxsc,wflxsc,qwflxsc,hf
 
 
          initp%wflxlc(ico)     = wflxlc
-         initp%wflxtr(ico)     = transp
+         initp%wflxtr(ico)     = initp%transp(ico)
          initp%hflx_lrsti(ico) = initp%rshort_l(ico) + initp%rlong_l(ico)                  &
                                - qwshed + leaf_qintercepted
 
@@ -1580,7 +1580,7 @@ subroutine canopy_derivs_two(mzg,initp,dinitp,csite,ipa,hflxsc,wflxsc,qwflxsc,hf
          if (fast_diagnostics) then
             dinitp%avg_sensible_lc      (ico)  = hflxlc
             dinitp%avg_vapor_lc         (ico)  = wflxlc
-            dinitp%avg_transp           (ico)  = transp
+            dinitp%avg_transp           (ico)  = initp%transp(ico)
             dinitp%avg_intercepted_al   (ico)  = leaf_intercepted
             dinitp%avg_wshed_lg         (ico)  = wshed
          end if
@@ -1603,7 +1603,7 @@ subroutine canopy_derivs_two(mzg,initp,dinitp,csite,ipa,hflxsc,wflxsc,qwflxsc,hf
          wflxlc_tot   = wflxlc_tot   + wflxlc
          qwflxlc_tot  = qwflxlc_tot  + qwflxlc
          hflxlc_tot   = hflxlc_tot   + hflxlc
-         transp_tot   = transp_tot   + transp
+         transp_tot   = transp_tot   + initp%transp(ico)
          qtransp_tot  = qtransp_tot  + qtransp
 
          !---------------------------------------------------------------------------------!
@@ -1951,9 +1951,9 @@ subroutine canopy_derivs_two(mzg,initp,dinitp,csite,ipa,hflxsc,wflxsc,qwflxsc,hf
           ! with plant hydraulics, consider changes in leaf_hcap
 
           ! first deal with water
-          if (.not. initp%leaf_resolvable(ico)) transp = 0.d0
+          if (.not. initp%leaf_resolvable(ico)) initp%transp(ico) = 0.d0
           wflux_wl  = dble(cpatch%wflux_wl(ico)) * dble(cpatch%nplant(ico))
-          dinitp%leaf_water_int(ico) = wflux_wl - transp 
+          dinitp%leaf_water_int(ico) = wflux_wl - initp%transp(ico) 
           dinitp%wood_water_int(ico) = -wflux_wl 
           ! soil water uptake will be accounted for later in leaftw_derivs
 
@@ -1966,7 +1966,7 @@ subroutine canopy_derivs_two(mzg,initp,dinitp,csite,ipa,hflxsc,wflxsc,qwflxsc,hf
           else if (plant_hydro_scheme <  0) then
               ! not track changes in hcap. We have to force wflux_wl to be the
               ! same as transp when calculating energy fluxes
-              qwflux_wl = transp * tl2uint8(initp%wood_temp(ico),1.d0)
+              qwflux_wl = initp%transp(ico) * tl2uint8(initp%wood_temp(ico),1.d0)
               dinitp%leaf_energy(ico) = dinitp%leaf_energy(ico) + qwflux_wl ! Energy in sapflow
 
               ! Similarly, we have to force wflux_wl to be the same as wflux_gw

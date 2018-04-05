@@ -11,6 +11,8 @@ subroutine update_derived_props(cgrid)
                             , sitetype    ! ! structure
    use hydr_coupler, only : hydr_init_coupler
 
+   use grid_coms, only: nzg
+
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(edtype)      , target  :: cgrid
@@ -31,7 +33,7 @@ subroutine update_derived_props(cgrid)
         do ipa = 1,csite%npatches
            call update_patch_derived_props(csite,ipa)
 
-           call hydr_init_coupler(csite,ipa)
+           call hydr_init_coupler(csite,ipa,cpoly%ntext_soil(nzg,isi))
         end do
 
         call update_site_derived_props(cpoly, 0, isi)

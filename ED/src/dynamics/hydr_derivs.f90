@@ -404,6 +404,8 @@ Contains
     d_wood_growth = 0.
     d_soil_water = 0.
 
+return
+
     d_water_mass_xy_cn = d_water_mass_xy_cn - transpiration
     ! Unbalanced; should be added to atmosphere.
 

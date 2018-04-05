@@ -228,6 +228,7 @@ module rk4_coms
       real(kind=8), pointer, dimension(:) :: psi_closed   ! Water demand (clos.)[kg/m�lf/s]
       real(kind=8), pointer, dimension(:) :: fs_open      ! Frac. of op. stom.  [      ---]
       real(kind=8), pointer, dimension(:) :: gpp          ! Gross primary prod. [�mol/m�/s]
+      real(kind=8), pointer, dimension(:) :: transp       ! kg/m2/s
       real(kind=8), pointer, dimension(:) :: leaf_resp    ! Leaf respiration    [�mol/m�/s]
       real(kind=8), pointer, dimension(:) :: root_resp    ! Root respiration    [�mol/m�/s]
       real(kind=8), pointer, dimension(:) :: leaf_storage_resp ! Storage resp   [�mol/m�/s]
@@ -1202,6 +1203,7 @@ module rk4_coms
       allocate(y%psi_closed       (maxcohort))
       allocate(y%fs_open          (maxcohort))
       allocate(y%gpp              (maxcohort))
+      allocate(y%transp              (maxcohort))
       allocate(y%leaf_resp        (maxcohort))
       allocate(y%root_resp        (maxcohort))
       allocate(y%leaf_growth_resp (maxcohort))
@@ -1309,6 +1311,7 @@ module rk4_coms
       nullify(y%psi_closed       )
       nullify(y%fs_open          )
       nullify(y%gpp              )
+      nullify(y%transp              )
       nullify(y%leaf_resp        )
       nullify(y%root_resp        )
       nullify(y%leaf_growth_resp )
@@ -1415,6 +1418,7 @@ module rk4_coms
       if (associated(y%psi_closed       )) y%psi_closed       = 0.d0
       if (associated(y%fs_open          )) y%fs_open          = 0.d0
       if (associated(y%gpp              )) y%gpp              = 0.d0
+      if (associated(y%transp              )) y%transp              = 0.d0
       if (associated(y%leaf_resp        )) y%leaf_resp        = 0.d0
       if (associated(y%root_resp        )) y%root_resp        = 0.d0
       if (associated(y%leaf_growth_resp )) y%leaf_growth_resp = 0.d0
@@ -1522,6 +1526,7 @@ module rk4_coms
       if (associated(y%psi_closed       )) deallocate(y%psi_closed        )
       if (associated(y%fs_open          )) deallocate(y%fs_open           )
       if (associated(y%gpp              )) deallocate(y%gpp               )
+      if (associated(y%transp              )) deallocate(y%transp               )
       if (associated(y%leaf_resp        )) deallocate(y%leaf_resp         )
       if (associated(y%root_resp        )) deallocate(y%root_resp         )
       if (associated(y%leaf_growth_resp )) deallocate(y%leaf_growth_resp  )

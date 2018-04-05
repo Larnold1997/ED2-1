@@ -1299,7 +1299,7 @@ subroutine update_diagnostic_vars(initp, csite,ipa)
    end if
    !---------------------------------------------------------------------------------------!
 
-   call hydr_diag_coupler(csite,ipa,initp%hydr,real(initp%can_temp), real(initp%soil_water), ntxt)
+   call hydr_diag_coupler(csite,ipa,initp%hydr,real(initp%can_temp), real(initp%soil_water), rk4site%ntext_soil(nzg))
 
    return
 end subroutine update_diagnostic_vars
