@@ -268,7 +268,9 @@ subroutine copy_rk4_patch(sourcep, targetp, cpatch)
       end do
    end if
 
-
+     do k=1,cpatch%ncohorts
+	call copy_hydrtype(sourcep%hydr,targetp%hydr,k,k)
+     end do
 
    return
 end subroutine copy_rk4_patch
