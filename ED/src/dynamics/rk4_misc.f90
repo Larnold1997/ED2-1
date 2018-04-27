@@ -403,7 +403,9 @@ subroutine copy_patch_init(sourcesite,ipa,targetp,vels)
       targetp%psi_open(ico)   = 0.d0
       targetp%psi_closed(ico) = 0.d0
       !------------------------------------------------------------------------------------!
-      
+    
+   call copy_hydrtype(cpatch%hydr,targetp%hydr,ico,ico)
+  
    end do
    !---------------------------------------------------------------------------------------!
 
