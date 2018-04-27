@@ -438,6 +438,9 @@ module rk4_driver
                                       , k_fire_first         ! ! intent(in)
       use plant_hydro          , only : tw2rwc               ! ! subroutine
       use physiology_coms      , only : plant_hydro_scheme
+
+      use hydr_state_vars, only : copy_hydrtype      
+
       implicit none
       !----- Arguments --------------------------------------------------------------------!
       type(rk4patchtype), target      :: initp
@@ -1442,6 +1445,10 @@ module rk4_driver
                             &,'rk4_driver.f90')
          end if
          !---------------------------------------------------------------------------------!
+
+
+      call copy_hydrtype(initp%hydr,cpatch%hydr,ico,ico)
+
       end do
       !------------------------------------------------------------------------------------!
 
