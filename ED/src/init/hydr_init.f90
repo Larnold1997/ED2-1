@@ -241,14 +241,14 @@ Contains
          0.001) / (1.0 + exp(-20.0*(turgor_pressure_ca_sm-0.1)))
     ! Q: Not at all sure about the crown, root equation.
 
-    ! Vertical resistances
+    ! Vertical resistances    
     call sap_viscosity(sucrose_mass_ph_sm,   &
          water_mass_ph_sm, viscosity)
     vert_resistance_ph = viscosity * stem_height /   &
          (vert_permeability_ph * 0.25 * pi1 *   &
          (phloem_diameter**2 - &
          cambium_diameter**2) * wdns) * 1.0e-12
-    
+   
     call sap_viscosity(0.0, water_mass_xy_sm, viscosity)
     vert_resistance_xy = viscosity * stem_height /   &
          (vert_permeability_xy * 0.25 * pi1 *   &
@@ -584,6 +584,7 @@ Contains
 
 !    water_root_uptake = 0.
 
+    print *, Water_mass_PH_SM,sucrose_mass_PH_SM
     return
   end subroutine hydr_init_vars
 
