@@ -423,10 +423,10 @@ print *, transpiration, turgor_pressure_xy_cn
          vert_water_flow_ph_cn_sm, turgor_pressure_ph_rt, &
          turgor_pressure_ph_sm, turgor_pressure_ph_cn, vert_resistance_ph)
 
-   d_water_mass_xy_sm = d_water_mass_xy_sm - vert_water_flow_xy_sm_cn
-   d_water_mass_xy_cn = d_water_mass_xy_cn + vert_water_flow_xy_sm_cn
+    d_water_mass_xy_sm = d_water_mass_xy_sm - vert_water_flow_xy_sm_cn
+    d_water_mass_xy_cn = d_water_mass_xy_cn + vert_water_flow_xy_sm_cn
 
-   d_water_mass_xy_sm = d_water_mass_xy_sm + vert_water_flow_xy_rt_sm
+    d_water_mass_xy_sm = d_water_mass_xy_sm + vert_water_flow_xy_rt_sm
     d_soil_water = d_soil_water - vert_water_flow_xy_rt_sm
 return 
     d_water_mass_ph_rt = d_water_mass_ph_rt + vert_water_flow_ph_sm_rt
