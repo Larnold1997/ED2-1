@@ -24135,6 +24135,8 @@ module ed_state_vars
       use ed_var_tables, only : vtable_edio_r  & ! sub-routine
                               , metadata_edio  ! ! sub-routine
 
+      use hydr_state_vars, only : filltab_hydrtype
+
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
       type(patchtype), target        :: cpatch
@@ -24262,6 +24264,11 @@ module ed_state_vars
            var_len,var_len_global,max_ptrs,'BROOT :41:hist:anal:year:dail:mont:dcyc') 
          call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
       end if
+
+      if (allocated(cpatch%hydr%water_mass_xy_sm)) then
+	call filltab_hydrtype(nvar, npts, cpatch%hydr, igr, init, &
+		cpatch%coglob_id, var_len, var_len_global, max_ptrs)
+      endif
 
       if (associated(cpatch%bsapwooda)) then
          nvar=nvar+1
