@@ -392,7 +392,8 @@ subroutine canopy_photosynthesis(csite,cmet,mzg,ipa,ntext_soil                  
              , llspan_tuco                 & ! Leaf life span                   [       yr]
              , vm0_tuco                    & ! Vm0 of the leaf                  [�mol/m�/s]
              , cpatch%leaf_gbw(tuco)       & ! Aerodyn. condct. of water vapour [  kg/m�/s]
-             , 0.                          & ! Leaf water potential             [        m]
+            ! , 0.                          & ! Leaf water potential             [        m]
+             , cpatch%hydr%turgor_pressure_xy_cn(tuco) &
              , cpatch%last_gV(tuco)        & ! gs from last timestep            [  kg/m2/s]
              , cpatch%last_gJ(tuco)        & ! gs from last timestep            [  kg/m2/s]
              , csite%A_o_max(ipft,ipa)     & ! Photosynthesis rate     (open)   [�mol/m�/s]
@@ -524,8 +525,9 @@ subroutine canopy_photosynthesis(csite,cmet,mzg,ipa,ntext_soil                  
              , cpatch%llspan(ico)          & ! Leaf life span                   [       yr]
              , vm0_ico                     & ! Vm0 of the leaf                  [�mol/m�/s]
              , cpatch%leaf_gbw(ico)        & ! Aerodyn. condct. of water vapour [  kg/m�/s]
-             , cpatch%leaf_psi(ico)        & ! Leaf water potential             [        m]
-             , cpatch%last_gV(ico)         & ! gs from last timestep            [  kg/m2/s]
+            ! , cpatch%leaf_psi(ico)        & ! Leaf water potential             [        m]
+             , cpatch%hydr%turgor_pressure_xy_cn(ico) & 
+	     , cpatch%last_gV(ico)         & ! gs from last timestep            [  kg/m2/s]
              , cpatch%last_gJ(ico)         & ! gs from last timestep            [  kg/m2/s]
              , cpatch%A_open(ico)          & ! Photosynthesis rate     (open)   [�mol/m�/s]
              , cpatch%A_closed(ico)        & ! Photosynthesis rate     (closed) [�mol/m�/s]
