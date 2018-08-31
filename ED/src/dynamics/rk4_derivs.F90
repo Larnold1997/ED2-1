@@ -930,7 +930,7 @@ subroutine canopy_derivs_two(mzg,initp,dinitp,csite,ipa,hflxsc,wflxsc,qwflxsc,hf
    use canopy_struct_dynamics, only : vertical_vel_flux8   ! ! function
    use budget_utils          , only : compute_netrad       ! ! function
    use physiology_coms       , only : plant_hydro_scheme   ! ! intent(in)
-   use pft_coms              , only : leaf_psi_min         ! ! intent(in)
+   use pft_coms              , only : leaf_psi_min, leaf_psi_tlp         ! ! intent(in)
    !$ use omp_lib
 
    implicit none
@@ -1487,9 +1487,13 @@ subroutine canopy_derivs_two(mzg,initp,dinitp,csite,ipa,hflxsc,wflxsc,qwflxsc,hf
                   dinitp%psi_open  (ico) = gleaf_open   * shv_gradient
                   dinitp%psi_closed(ico) = gleaf_closed * shv_gradient
 
+                  initp%fs_open(ico) = 1./(1. + (initp%hydr%turgor_pressure_xy_cn(ico)/leaf_psi_tlp(ipft)) ** 6.0)
+
                   initp%transp(ico) = initp%lai(ico) * ( initp%fs_open(ico) * dinitp%psi_open(ico)    &
                                             + (1.0d0 - initp%fs_open(ico))                 &
                                             * dinitp%psi_closed(ico) )
+                  print *, "transp" , initp%fs_open(ico), initp%transp(ico)
+
                else
                   dinitp%psi_open(ico)   = 0.d0
                   dinitp%psi_closed(ico) = 0.d0
