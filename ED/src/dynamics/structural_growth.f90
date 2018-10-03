@@ -1378,10 +1378,10 @@ subroutine update_cohort_plastic_trait(cpatch,ico)
 
             do cohort_idx = 1,ico-1
             ! from the top cohort to current cohort
-                max_cum_lai = max_cum_lai&
-                            + size2bl(cpatch%dbh(cohort_idx),&
-                                      cpatch%hite(cohort_idx),&
-                                      cpatch%pft(cohort_idx)) * &
+                max_cum_lai = max_cum_lai                           &
+                            + size2bl(cpatch%dbh(cohort_idx),       &
+                                      cpatch%hite(cohort_idx),      &
+                                      cpatch%pft(cohort_idx)) *     &
                               cpatch%sla(cohort_idx) * cpatch%nplant(cohort_idx)
             enddo
 
@@ -1414,9 +1414,12 @@ subroutine update_cohort_plastic_trait(cpatch,ico)
        kvm0 = exp(0.00963 * vm25 - 2.43)
        ! This function is from Lloyd et al. 2010
 
-       ksla = 2.61e-3 * vm25
-       ! This function is inferred from SLA-Nitrogen relationship in 
-       ! Lloyd et al. 2010 and Nitrogen-Vcmax25 relationship inKattge et al. 2009
+       ksla = kvm0 - 0.035
+       ! This value is estimated from canopy and underground 
+       ! leaf traits data from BCI, Panama. It reflects that 
+       ! LMA goes down sloer than Vcmax within canopy.
+       ! So that at lower canopy, Vcmax/LMA is smaller than
+       ! the value at canopy
 
        lma_slope = 0.015  ! linearized slope, should only be used
                           ! when trait_plasticity_scheme < 0
@@ -1444,6 +1447,7 @@ subroutine update_cohort_plastic_trait(cpatch,ico)
        ! plant_hydro_driver. We will leave A_open and A_closed unchanged because
        ! growth of the day has already happen at this time point in the model
        sla_scaler = cpatch%sla(ico) / new_sla
+       cpatch%sla(ico) = new_sla
        cpatch%psi_open(ico)     = cpatch%psi_open(ico) * sla_scaler
        cpatch%psi_closed(ico)   = cpatch%psi_closed(ico) * sla_scaler
 

@@ -3879,6 +3879,7 @@ subroutine init_pft_derived_params()
       , size2bl          & ! function
       , dbh2bd               ! ! function
    use ed_therm_lib         , only : calc_veg_hcap        ! ! function
+   use phenology_coms       , only : elongf_min           ! ! intent(in)
    implicit none
    !----- Local variables. ----------------------------------------------------------------!
    integer                           :: ipft
@@ -4009,9 +4010,12 @@ subroutine init_pft_derived_params()
 
 
       !------------------------------------------------------------------------------------!
-      !    Seed_rain is the density of seedling that will be added from somewhere else.    !
+      !    Seed_rain is the density of seedling that will be added from somewhere else     !
+      ! EVERY YEAR.                                                                        !
+      !    XXT: Now we accumulate seed_rain every month. So, the seed_rain values is       !
+      ! divided by 12                                                                      !
       !------------------------------------------------------------------------------------!
-      seed_rain(ipft)  = 0.1 * init_density(ipft)
+      seed_rain(ipft)  = 0.1 * init_density(ipft) / 12.
       !------------------------------------------------------------------------------------!
 
 
@@ -4045,8 +4049,8 @@ subroutine init_pft_derived_params()
       call calc_veg_hcap(bleaf_min,bdead_min,bsapwood_min,init_density(ipft),ipft          &
          ,broot_min,dbh,leaf_rwc_min(ipft),wood_rwc_min(ipft)                              &
          ,leaf_hcap_min,wood_hcap_min)
-      veg_hcap_min(ipft) = onesixth * leaf_hcap_min
-      lai_min            = onesixth * init_density(ipft) * bleaf_min * sla(ipft)
+      veg_hcap_min(ipft) = elongf_min * leaf_hcap_min
+      lai_min            = elongf_min * init_density(ipft) * bleaf_min * sla(ipft)
       !------------------------------------------------------------------------------------!
 
 
