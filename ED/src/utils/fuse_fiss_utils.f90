@@ -990,11 +990,7 @@ module fuse_fiss_utils
                           ,cpatch%bleaf(ico),cpatch%bdead(ico),cpatch%broot(ico)        &
                           ,dbh2sf(cpatch%dbh(ico),cpatch%pft(ico)),cpatch%pft(ico)      &
                           ,cpatch%leaf_water_int(ico),cpatch%wood_water_int(ico))
-<<<<<<< HEAD
 
-=======
-               
->>>>>>> f95b1772cebc77c5deda2a1f3afe6e0eb7a27693
                ! new cohort
                call calc_veg_hcap(cpatch%bleaf(inew),cpatch%bdead(inew)                 &
                                  ,cpatch%bsapwooda(inew),cpatch%nplant(inew)            &
@@ -1447,11 +1443,7 @@ module fuse_fiss_utils
 
 
 
-<<<<<<< HEAD
       ! Before updating psi_open, psi_closed, fs_open and fs_closed,
-=======
-      ! Before updating psi_open, psi_closed, fs_open and fs_closed, 
->>>>>>> f95b1772cebc77c5deda2a1f3afe6e0eb7a27693
       ! record total_transp to conserve.
       ! This is essential to keep consistency in plant hydraulics after fusion
       total_transp              = ( cpatch%psi_open(recc) * cpatch%fs_open(recc)           &
@@ -1492,11 +1484,7 @@ module fuse_fiss_utils
                                 + cpatch%fsw     (donc) * dlai
       cpatch%fsn     (recc)     = cpatch%fsn     (recc) * rlai                             &
                                 + cpatch%fsn     (donc) * dlai
-<<<<<<< HEAD
       ! XXT: The original scaling for fs_open can be problematic
-=======
-      ! XXT: The original scaling for fs_open can be problematic 
->>>>>>> f95b1772cebc77c5deda2a1f3afe6e0eb7a27693
       ! when photorespiration is too high (see photosyn_driv.f90 for details).
       ! In this scenario, fs_open is decoupled from fsw * fsn.
       ! Now we update cpatch%fs_open by conserving total_transp
