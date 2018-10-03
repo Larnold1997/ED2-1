@@ -18,12 +18,12 @@ module fuse_fiss_utils
    contains
    !=======================================================================================!
    !=======================================================================================!
-   !  SUBROUTINE: SORT_COHORTS      
+   !  SUBROUTINE: SORT_COHORTS
    !> \brief This subroutine will sort the cohorts by size (1st = tallest, last = shortest.)
    !> \details In case there is a tie (for example, when 2 cohorts have reached the
    !> maximum possible height, then we use DBH for tie breaking, and if they have the
    !> exact same DBH, then we simply pick the lowest index (as they are exactly the same).
-   !> This could cause some problems when the new grass allometry is implemented, though.       
+   !> This could cause some problems when the new grass allometry is implemented, though.
    !---------------------------------------------------------------------------------------!
    subroutine sort_cohorts(cpatch)
 
@@ -39,7 +39,7 @@ module fuse_fiss_utils
       logical                                    :: sorted    ! Patch is already sorted
       logical        , dimension(:), allocatable :: attop     ! Top cohorts, for tie-break
       !------------------------------------------------------------------------------------!
-      
+
       !----- No need to sort an empty patch or a patch with a single cohort. --------------!
       if (cpatch%ncohorts < 2) return
 
@@ -112,7 +112,7 @@ module fuse_fiss_utils
 
    !=======================================================================================!
    !=======================================================================================!
-   !  SUBROUTINE: TERMINATE_COHORTS 
+   !  SUBROUTINE: TERMINATE_COHORTS
    !> \brief This subroutine will eliminate cohorts based on their sizes.
    !> This is intended to eliminate cohorts that have little contribution
    !> and thus we can speed up the run.
@@ -142,7 +142,7 @@ module fuse_fiss_utils
       integer                            :: ipft         ! PFT size
       real                               :: csize        ! Size of current cohort
       !------------------------------------------------------------------------------------!
-      
+
       cpatch => csite%patch(ipa)
       elim_nplant = 0.
       elim_lai    = 0.
@@ -152,7 +152,7 @@ module fuse_fiss_utils
       allocate(temppatch)
       allocate(remain_table(cpatch%ncohorts))
       remain_table(:) = .true.
-     
+
       !----- Main loop --------------------------------------------------------------------!
       do ico = 1,cpatch%ncohorts
 
@@ -176,11 +176,11 @@ module fuse_fiss_utils
             csite%fsn_in(ipa) = csite%fsn_in(ipa) + cpatch%nplant(ico)                     &
                               * ( f_labile(ipft) * cpatch%balive(ico) / c2n_leaf(ipft)     &
                                 + cpatch%bstorage(ico) / c2n_storage)
-            
+
             csite%ssc_in(ipa) = csite%ssc_in(ipa) + cpatch%nplant(ico)                     &
                               * ( (1.0 - f_labile(ipft)) * cpatch%balive(ico)              &
                                 + cpatch%bdead(ico))
-            
+
             csite%ssl_in(ipa) = csite%ssl_in(ipa) + cpatch%nplant(ico)                     &
                               * ( (1.0 - f_labile(ipft)) * cpatch%balive(ico)              &
                                 + cpatch%bdead(ico) ) * l2n_stem/c2n_stem(ipft)
@@ -198,8 +198,8 @@ module fuse_fiss_utils
       call allocate_patchtype(cpatch,count(remain_table))
       call copy_patchtype(temppatch,cpatch,1,cpatch%ncohorts,1,cpatch%ncohorts)
       call sort_cohorts(cpatch)
-     
-      !----- Deallocate the temporary patch -----------------------------------------------!     
+
+      !----- Deallocate the temporary patch -----------------------------------------------!
       call deallocate_patchtype(temppatch)
       deallocate(temppatch)
       deallocate(remain_table)
@@ -222,7 +222,7 @@ module fuse_fiss_utils
 
    !=======================================================================================!
    !=======================================================================================!
-   !  SUBROUTINE: TERMINATE_PATCHES 
+   !  SUBROUTINE: TERMINATE_PATCHES
    !> \brief This subroutine will eliminate tiny or empty patches. This is intended to
    !> eliminate patches that have little contribution and thus we can speed up the run.
    !---------------------------------------------------------------------------------------!
@@ -295,8 +295,8 @@ module fuse_fiss_utils
          write (unit=*,fmt='(a,1x,es12.5)') ' + NEW_AREA: ',new_area
          call fatal_error('New_area should be 1 but it isn''t!!!','terminate_patches'      &
                          ,'fuse_fiss_utils.f90')
-      end if 
-      
+      end if
+
       return
    end subroutine terminate_patches
    !=======================================================================================!
@@ -309,7 +309,7 @@ module fuse_fiss_utils
 
    !=======================================================================================!
    !=======================================================================================!
-   !  SUBROUTINE: RESCALE_PATCHES   
+   !  SUBROUTINE: RESCALE_PATCHES
    !> \brief This subroutine will rescale the area of the patches.
    !> This is almost the same as the terminate_patches subroutine,
    !> except that no patch is removed.
@@ -323,7 +323,7 @@ module fuse_fiss_utils
       use allometry    , only : size2bl        ! ! function
       use ed_max_dims  , only : n_dist_types       & ! intent(in)
                               , n_pft              ! ! intent(in)
-      
+
       implicit none
       !----- Arguments --------------------------------------------------------------------!
       type(sitetype)         , target      :: csite        ! Current site
@@ -455,7 +455,7 @@ module fuse_fiss_utils
          lu_laimax(ilu) = lu_laimax(ilu) + patch_laimax(ipa)
          lu_npatch(ilu) = lu_npatch(ilu) + 1
 
-         site_area      = site_area + csite%area(ipa) 
+         site_area      = site_area + csite%area(ipa)
       end do
       !------------------------------------------------------------------------------------!
 
@@ -524,7 +524,7 @@ module fuse_fiss_utils
          write (unit=*,fmt='(a)'          ) '---------------------------------------------'
          call fatal_error('New_area should be 1 but it isn''t!!!','rescale_patches'        &
                          ,'fuse_fiss_utils.f90')
-      end if 
+      end if
       !------------------------------------------------------------------------------------!
 
 
@@ -554,12 +554,12 @@ module fuse_fiss_utils
    !=======================================================================================!
    !  SUBROUTINE: FUSE_COHORTS
    !> \brief This subroutine will perform cohort fusion based on various
-   !> similarity criteria to determine whether they can be fused with no 
-   !> significant loss of information. 
-   !> \details The user is welcome to set up a benchmark, but should be 
+   !> similarity criteria to determine whether they can be fused with no
+   !> significant loss of information.
+   !> \details The user is welcome to set up a benchmark, but should be
    !> aware that no miracles will happen here. If there are more very distinct
    !> cohorts than maxcohort, then the user will need to live with that and
-   !> accept life is not always fair with those with limited computational resources.           
+   !> accept life is not always fair with those with limited computational resources.
    !---------------------------------------------------------------------------------------!
    subroutine fuse_cohorts(csite,ipa, lsl, fuse_initial)
 
@@ -589,7 +589,7 @@ module fuse_fiss_utils
       integer                              :: donc,recc,ico3 ! Counters
       logical                              :: fusion_test    ! Flag: proceed with fusion?
       real                                 :: newn           ! new nplants of merged coh.
-      real                                 :: lai_max        ! Maximum LAI the fused 
+      real                                 :: lai_max        ! Maximum LAI the fused
                                                              !    cohort could have.
       real                                 :: total_size     ! Total size
       real                                 :: tolerance_mult ! Multiplication factor
@@ -636,7 +636,7 @@ module fuse_fiss_utils
             mean_dbh  = mean_dbh + cpatch%dbh(ico3)
             ntall     = ntall + 1
          end if
-      end do 
+      end do
       !------------------------------------------------------------------------------------!
       if (ntall  > 0) mean_dbh = mean_dbh   / real(ntall)
       if (nshort > 0) mean_hite= mean_hite  / real(nshort)
@@ -646,9 +646,9 @@ module fuse_fiss_utils
       fuse_table(:) = .true.
 
       force_fusion: do
-         
+
          ncohorts_old =  count(fuse_table) ! Save current number of cohorts ---------------!
-         
+
          donloop:do donc = 1,cpatch%ncohorts-1
             if (.not. fuse_table(donc)) cycle donloop ! This one is gone, move to next.
 
@@ -668,7 +668,7 @@ module fuse_fiss_utils
                elseif (fuse_relax) then
                   fusion_test = ( abs(cpatch%hite(donc) - cpatch%hite(recc))               &
                                      / (0.5*(cpatch%hite(donc) + cpatch%hite(recc)))  <    &
-                                fusetol * tolerance_mult)  
+                                fusetol * tolerance_mult)
                else
                   fusion_test = (abs(cpatch%hite(donc) - cpatch%hite(recc))  <             &
                                 fusetol_h * tolerance_mult)
@@ -709,9 +709,9 @@ module fuse_fiss_utils
                                                      + cpatch%bdead(recc)                  &
                                                      + cpatch%bstorage(recc) )
 
-                  
-                  
-                  
+
+
+
                   !------------------------------------------------------------------------!
                   !    Six conditions must be met to allow two cohorts to be fused:        !
                   ! 1. Both cohorts must have the same PFT;                                !
@@ -741,7 +741,7 @@ module fuse_fiss_utils
 
                      !----- Flag donating cohort as gone, so it won't be checked again. ---!
                      fuse_table(donc) = .false.
-                     
+
                      !----- Check whether total size and LAI are conserved. ---------------!
                      new_size = cpatch%nplant(recc) * ( cpatch%balive(recc)                &
                                                       + cpatch%bdead(recc)                 &
@@ -807,9 +807,9 @@ module fuse_fiss_utils
                                  ,count(fuse_table))
 
          !----- Now I reallocate the current patch with its new reduced size. -------------!
-         call deallocate_patchtype(cpatch)  
+         call deallocate_patchtype(cpatch)
          call allocate_patchtype(cpatch,count(fuse_table))
-  
+
          !----- Make fuse_table true to all remaining cohorts. ----------------------------!
          fuse_table(:)                 = .false.
          fuse_table(1:cpatch%ncohorts) = .true.
@@ -818,7 +818,7 @@ module fuse_fiss_utils
 
          !----- Discard the scratch patch. ------------------------------------------------!
          call deallocate_patchtype(temppatch)
-         deallocate(temppatch)  
+         deallocate(temppatch)
 
          !----- Sort cohorts by size again, and update the cohort census for this patch. --!
          call sort_cohorts(cpatch)
@@ -827,7 +827,7 @@ module fuse_fiss_utils
 
       !----- Deallocate the aux. table ----------------------------------------------------!
       deallocate(fuse_table)
-     
+
       return
    end subroutine fuse_cohorts
    !=======================================================================================!
@@ -858,8 +858,11 @@ module fuse_fiss_utils
                                       , bd2dbh                 & ! function
                                       , bl2dbh                 & ! function
                                       , bl2h                   & ! function
-                                      , dbh2bd                 ! ! function
+                                      , dbh2bd                 & ! function
+                                      , dbh2sf                 ! ! function
       use ed_misc_coms         , only : igrass                 ! ! intent(in)
+      use ed_therm_lib         , only : calc_veg_hcap          ! ! function
+      use plant_hydro          , only : rwc2tw                 ! ! subroutine
       implicit none
       !----- Constants --------------------------------------------------------------------!
       real                   , parameter   :: epsilon=0.0001    ! Tweak factor...
@@ -891,17 +894,17 @@ module fuse_fiss_utils
       do ico = 1,cpatch%ncohorts
          ipft = cpatch%pft(ico)
 
-         !---------------------------------------------------------------------------------! 
+         !---------------------------------------------------------------------------------!
          !     STAI is the potential TAI that this cohort has when its leaves are fully    !
          ! flushed.                                                                        !
-         !---------------------------------------------------------------------------------! 
+         !---------------------------------------------------------------------------------!
          stai = cpatch%nplant(ico) * cpatch%balive(ico) * green_leaf_factor(ipft)          &
               * q(ipft) / ( 1.0 + q(ipft) + qsw(ipft) * cpatch%hite(ico) )                 &
               * cpatch%sla(ico) + cpatch%wai(ico)
 
          !----- If the resulting TAI is too large, split this cohort. ---------------------!
          split_mask(ico) = stai > lai_tol
-         
+
          old_nplant = old_nplant + cpatch%nplant(ico)
          old_size   = old_size   + cpatch%nplant(ico) * ( cpatch%balive(ico)               &
                                                         + cpatch%bdead(ico)                &
@@ -911,7 +914,7 @@ module fuse_fiss_utils
       !----- Compute the new number of cohorts. -------------------------------------------!
       tobesplit    = count(split_mask)
       ncohorts_new = cpatch%ncohorts + tobesplit
-      
+
       if (tobesplit > 0) then
 
          !----- Allocate the temppatch. ---------------------------------------------------!
@@ -934,7 +937,7 @@ module fuse_fiss_utils
          !----- Remove the temporary patch. -----------------------------------------------!
          call deallocate_patchtype(temppatch)
          deallocate(temppatch)
-     
+
          inew = size(split_mask)
          do ico = 1,size(split_mask)
 
@@ -954,7 +957,7 @@ module fuse_fiss_utils
                !---------------------------------------------------------------------------!
 
                !----- Tweaking bdead, to ensure carbon is conserved. ----------------------!
-               if (is_grass(cpatch%pft(ico)) .and. igrass==1) then 
+               if (is_grass(cpatch%pft(ico)) .and. igrass==1) then
                    !-- use bleaf for grass
                    cpatch%bleaf(ico)  = cpatch%bleaf(ico) * (1.-epsilon)
                    cpatch%dbh  (ico)  = bl2dbh(cpatch%bleaf(ico), cpatch%pft(ico))
@@ -974,6 +977,30 @@ module fuse_fiss_utils
                    cpatch%hite (inew) = dbh2h(cpatch%pft(inew), cpatch%dbh(inew))
                end if
                !---------------------------------------------------------------------------!
+
+               ! since biomass has changed, we need to modify wood water_int
+               ! and hcap
+               ! original cohort
+               call calc_veg_hcap(cpatch%bleaf(ico) ,cpatch%bdead(ico)                  &
+                                 ,cpatch%bsapwooda(ico),cpatch%nplant(ico)              &
+                                 ,cpatch%pft(ico),cpatch%broot(ico),cpatch%dbh(ico)     &
+                                 ,cpatch%leaf_rwc(ico),cpatch%wood_rwc(ico)             &
+                                 ,cpatch%leaf_hcap(ico),cpatch%wood_hcap(ico))
+               call rwc2tw(cpatch%leaf_rwc(ico),cpatch%wood_rwc(ico)                    &
+                          ,cpatch%bleaf(ico),cpatch%bdead(ico),cpatch%broot(ico)        &
+                          ,dbh2sf(cpatch%dbh(ico),cpatch%pft(ico)),cpatch%pft(ico)      &
+                          ,cpatch%leaf_water_int(ico),cpatch%wood_water_int(ico))
+
+               ! new cohort
+               call calc_veg_hcap(cpatch%bleaf(inew),cpatch%bdead(inew)                 &
+                                 ,cpatch%bsapwooda(inew),cpatch%nplant(inew)            &
+                                 ,cpatch%pft(inew),cpatch%broot(inew),cpatch%dbh(inew)  &
+                                 ,cpatch%leaf_rwc(inew),cpatch%wood_rwc(inew)           &
+                                 ,cpatch%leaf_hcap(inew),cpatch%wood_hcap(inew))
+               call rwc2tw(cpatch%leaf_rwc(inew),cpatch%wood_rwc(inew)                  &
+                          ,cpatch%bleaf(inew),cpatch%bdead(inew),cpatch%broot(inew)     &
+                          ,dbh2sf(cpatch%dbh(inew),cpatch%pft(inew)),cpatch%pft(inew)   &
+                          ,cpatch%leaf_water_int(inew),cpatch%wood_water_int(inew))
 
             end if
          end do
@@ -999,7 +1026,7 @@ module fuse_fiss_utils
             call fatal_error('Cohort splitting didn''t conserve plants!!!'                 &
                                         &,'split_cohorts','fuse_fiss_utils.f90')
          end if
-         
+
       end if
       deallocate(split_mask)
       return
@@ -1044,7 +1071,7 @@ module fuse_fiss_utils
       use fusion_fission_coms, only : corr_cohort
       use grid_coms          , only : nzg                    ! ! intent(in)
       use plant_hydro        , only : rwc2psi                & ! subroutine
-                                    , tw2rwc                 & ! subroutine 
+                                    , tw2rwc                 & ! subroutine
                                     , psi2tw                 & ! subroutine
                                     , tw2psi                 ! ! subroutine
       implicit none
@@ -1070,6 +1097,7 @@ module fuse_fiss_utils
       real                         :: dwai              ! WAI of donor
       real                         :: rnplant           ! nplant of receiver
       real                         :: dnplant           ! nplant of donor
+      real                         :: total_transp      ! total transpiration to conserve
       !------------------------------------------------------------------------------------!
 
 
@@ -1202,9 +1230,9 @@ module fuse_fiss_utils
          call uextcm2tl(cpatch%leaf_energy(recc),cpatch%leaf_water(recc)                   &
                        ,cpatch%leaf_hcap(recc),cpatch%leaf_temp(recc)                      &
                        ,cpatch%leaf_fliq(recc))
-         
-         
-      else 
+
+
+      else
          !----- Leaf temperature cannot be found using uextcm2tl, this is a singularity. --!
          cpatch%leaf_temp(recc)  = cpatch%leaf_temp(recc) * rnplant                        &
                                  + cpatch%leaf_temp(donc) * dnplant
@@ -1217,13 +1245,13 @@ module fuse_fiss_utils
          call uextcm2tl(cpatch%wood_energy(recc),cpatch%wood_water(recc)                   &
                        ,cpatch%wood_hcap(recc),cpatch%wood_temp(recc)                      &
                        ,cpatch%wood_fliq(recc))
-      else 
+      else
          !----- Wood temperature cannot be found using uextcm2tl, this is a singularity. --!
          cpatch%wood_temp(recc)  = cpatch%wood_temp(recc) * rnplant                        &
                                  + cpatch%wood_temp(donc)  * dnplant
          cpatch%wood_fliq(recc)  = 0.0
       end if
-      
+
       !----- Set time-steps temperatures as the current. ----------------------------------!
       cpatch%leaf_temp_pv(recc) = cpatch%leaf_temp(recc)
       cpatch%wood_temp_pv(recc) = cpatch%wood_temp(recc)
@@ -1242,7 +1270,7 @@ module fuse_fiss_utils
       !     CB and CB_Xmax are scaled by population, as they are in kgC/plant/yr.          !
       !------------------------------------------------------------------------------------!
       ! RK: I think the below comment is no longer true. Per gh-24 reverting again to      !
-      ! calculate CBR from running means of CB and CB_Xmax. 
+      ! calculate CBR from running means of CB and CB_Xmax.
       ! "The relative carbon balance, however, is no longer derived from the annual values !
       ! of CB, CB_LightMax, and CB_MoistMax, but tracked independently as it used to be    !
       ! done in ED-1.0."                                                                   !
@@ -1276,28 +1304,28 @@ module fuse_fiss_utils
       !------------------------------------------------------------------------------------!
       cpatch%today_gpp          (recc) = cpatch%today_gpp          (recc)                  &
                                        + cpatch%today_gpp          (donc)
-                                  
+
       cpatch%today_nppleaf      (recc) = cpatch%today_nppleaf      (recc)                  &
                                        + cpatch%today_nppleaf      (donc)
-                                  
+
       cpatch%today_nppfroot     (recc) = cpatch%today_nppfroot     (recc)                  &
                                        + cpatch%today_nppfroot     (donc)
-                                  
+
       cpatch%today_nppsapwood   (recc) = cpatch%today_nppsapwood   (recc)                  &
                                        + cpatch%today_nppsapwood   (donc)
-                                  
+
       cpatch%today_nppcroot     (recc) = cpatch%today_nppcroot     (recc)                  &
                                        + cpatch%today_nppcroot     (donc)
-                                  
+
       cpatch%today_nppseeds     (recc) = cpatch%today_nppseeds     (recc)                  &
                                        + cpatch%today_nppseeds     (donc)
-                                  
+
       cpatch%today_nppwood      (recc) = cpatch%today_nppwood      (recc)                  &
                                        + cpatch%today_nppwood      (donc)
-                                  
+
       cpatch%today_nppdaily     (recc) = cpatch%today_nppdaily     (recc)                  &
                                        + cpatch%today_nppdaily     (donc)
-                                  
+
       cpatch%today_gpp_pot      (recc) = cpatch%today_gpp_pot      (recc)                  &
                                        + cpatch%today_gpp_pot      (donc)
 
@@ -1415,6 +1443,16 @@ module fuse_fiss_utils
 
 
 
+      ! Before updating psi_open, psi_closed, fs_open and fs_closed,
+      ! record total_transp to conserve.
+      ! This is essential to keep consistency in plant hydraulics after fusion
+      total_transp              = ( cpatch%psi_open(recc) * cpatch%fs_open(recc)           &
+                                  + cpatch%psi_closed(recc) * (1. - cpatch%fs_open(recc))) &
+                                  * rlai                                                   &
+                                + ( cpatch%psi_open(donc) * cpatch%fs_open(donc)           &
+                                  + cpatch%psi_closed(donc) * (1. - cpatch%fs_open(donc))) &
+                                  * dlai
+
 
       !------------------------------------------------------------------------------------!
       !    Water demand is in kg/m2_leaf/s, so we scale them by LAI.  Water supply is in   !
@@ -1446,7 +1484,17 @@ module fuse_fiss_utils
                                 + cpatch%fsw     (donc) * dlai
       cpatch%fsn     (recc)     = cpatch%fsn     (recc) * rlai                             &
                                 + cpatch%fsn     (donc) * dlai
-      cpatch%fs_open (recc)     = cpatch%fsw(recc) * cpatch%fsn(recc)
+      ! XXT: The original scaling for fs_open can be problematic
+      ! when photorespiration is too high (see photosyn_driv.f90 for details).
+      ! In this scenario, fs_open is decoupled from fsw * fsn.
+      ! Now we update cpatch%fs_open by conserving total_transp
+      if ((cpatch%psi_open(recc) - cpatch%psi_closed(recc)) == 0.) then
+          ! This is the original scaling
+          cpatch%fs_open(recc)  = cpatch%fsw(recc) * cpatch%fsn(recc)
+      else
+          cpatch%fs_open (recc) = max(0.,min(1.,(total_transp - cpatch%psi_closed(recc))   &
+                                    / (cpatch%psi_open(recc) - cpatch%psi_closed(recc))))
+      endif
       !------------------------------------------------------------------------------------!
 
 
@@ -1772,7 +1820,7 @@ module fuse_fiss_utils
               + cpatch%fmean_wflux_gw_layer(isl,donc) * dnplant
          enddo
 
-         ! for daily maximum and minimum psi, we simply use NPLANT as weight 
+         ! for daily maximum and minimum psi, we simply use NPLANT as weight
          cpatch%dmax_leaf_psi(recc) = cpatch%dmax_leaf_psi(recc) * rnplant +               &
                                       cpatch%dmax_leaf_psi(donc) * dnplant
          cpatch%dmin_leaf_psi(recc) = cpatch%dmin_leaf_psi(recc) * rnplant +               &
@@ -1826,7 +1874,7 @@ module fuse_fiss_utils
                           ,cpatch%fmean_wood_hcap  (recc),cpatch%fmean_wood_temp (recc)    &
                           ,cpatch%fmean_wood_fliq  (recc))
             !------------------------------------------------------------------------------!
-         else                                                                              
+         else
             !----- Wood temperature can't be found using uextcm2tl (singularity). ---------!
             cpatch%fmean_wood_temp(recc) = cpatch%fmean_wood_temp(recc) * rnplant          &
                                          + cpatch%fmean_wood_temp(donc) * dnplant
@@ -2086,7 +2134,7 @@ module fuse_fiss_utils
             !----- Update temperature and liquid fraction using standard thermodynamics. --!
             call uextcm2tl(cpatch%dmean_leaf_energy(recc),cpatch%dmean_leaf_water(recc)    &
                           ,cpatch%dmean_leaf_hcap  (recc),cpatch%dmean_leaf_temp (recc)    &
-                          ,cpatch%dmean_leaf_fliq  (recc))                                                  
+                          ,cpatch%dmean_leaf_fliq  (recc))
             !------------------------------------------------------------------------------!
 
 
@@ -2102,15 +2150,15 @@ module fuse_fiss_utils
             cpatch%dmean_leaf_vpdef(recc) = cpatch%dmean_leaf_vpdef(recc) * rnplant        &
                                           + cpatch%dmean_leaf_vpdef(donc) * dnplant
             !------------------------------------------------------------------------------!
-         end if                                                                            
+         end if
          !------ Wood. --------------------------------------------------------------------!
-         if ( cpatch%dmean_wood_hcap(recc) > 0. ) then                                     
+         if ( cpatch%dmean_wood_hcap(recc) > 0. ) then
             !----- Update temperature using the standard thermodynamics. ------------------!
             call uextcm2tl(cpatch%dmean_wood_energy(recc),cpatch%dmean_wood_water(recc)    &
                           ,cpatch%dmean_wood_hcap  (recc),cpatch%dmean_wood_temp (recc)    &
                           ,cpatch%dmean_wood_fliq  (recc))
             !------------------------------------------------------------------------------!
-         else                                                                              
+         else
             !----- Wood temperature can't be found using uextcm2tl (singularity). ---------!
             cpatch%dmean_wood_temp(recc) = cpatch%dmean_wood_temp(recc) * rnplant          &
                                          + cpatch%dmean_wood_temp(donc) * dnplant
@@ -2464,7 +2512,7 @@ module fuse_fiss_utils
             !----- Update temperature and liquid fraction using standard thermodynamics. --!
             call uextcm2tl(cpatch%mmean_leaf_energy(recc),cpatch%mmean_leaf_water(recc)    &
                           ,cpatch%mmean_leaf_hcap  (recc),cpatch%mmean_leaf_temp (recc)    &
-                          ,cpatch%mmean_leaf_fliq  (recc))                                                  
+                          ,cpatch%mmean_leaf_fliq  (recc))
             !------------------------------------------------------------------------------!
 
 
@@ -2480,15 +2528,15 @@ module fuse_fiss_utils
             cpatch%mmean_leaf_vpdef(recc) = cpatch%mmean_leaf_vpdef(recc) * rnplant        &
                                           + cpatch%mmean_leaf_vpdef(donc) * dnplant
             !------------------------------------------------------------------------------!
-         end if                                                                            
+         end if
          !------ Wood. --------------------------------------------------------------------!
-         if ( cpatch%mmean_wood_hcap(recc) > 0. ) then                                     
+         if ( cpatch%mmean_wood_hcap(recc) > 0. ) then
             !----- Update temperature using the standard thermodynamics. ------------------!
             call uextcm2tl(cpatch%mmean_wood_energy(recc),cpatch%mmean_wood_water(recc)    &
                           ,cpatch%mmean_wood_hcap  (recc),cpatch%mmean_wood_temp (recc)    &
                           ,cpatch%mmean_wood_fliq  (recc))
             !------------------------------------------------------------------------------!
-         else                                                                              
+         else
             !----- Wood temperature can't be found using uextcm2tl (singularity). ---------!
             cpatch%mmean_wood_temp(recc) = cpatch%mmean_wood_temp(recc) * rnplant          &
                                          + cpatch%mmean_wood_temp(donc) * dnplant
@@ -2761,7 +2809,7 @@ module fuse_fiss_utils
          cpatch%qmean_par_l_diff    (:,recc) = cpatch%qmean_par_l_diff    (:,recc)         &
                                              + cpatch%qmean_par_l_diff    (:,donc)
 
- 
+
 
          cpatch%qmean_rshort_l      (:,recc) = cpatch%qmean_rshort_l      (:,recc)         &
                                              + cpatch%qmean_rshort_l      (:,donc)
@@ -2801,7 +2849,7 @@ module fuse_fiss_utils
                                              + cpatch%qmean_leaf_water_int(:,donc) * dnplant
          cpatch%qmean_wood_water_int(:,recc) = cpatch%qmean_wood_water_int(:,recc) * rnplant &
                                              + cpatch%qmean_wood_water_int(:,donc) * dnplant
-        
+
          ! Water fluxes are weighted by nplant since they are kg H2O/s/plant
          cpatch%qmean_wflux_gw      (:,recc) = cpatch%qmean_wflux_gw   (:,recc) * rnplant  &
                                              + cpatch%qmean_wflux_gw   (:,donc) * dnplant
@@ -2905,7 +2953,7 @@ module fuse_fiss_utils
 
    !=======================================================================================!
    !=======================================================================================!
-   !  SUBROUTINE: SORT_PATCHES  
+   !  SUBROUTINE: SORT_PATCHES
    !> \brief This subroutine will sort the patches by age (1st = oldest, last = youngest.)
    !---------------------------------------------------------------------------------------!
    subroutine sort_patches(csite)
@@ -2920,7 +2968,7 @@ module fuse_fiss_utils
       integer                  :: oldpa      ! Index of oldest patch
       logical                  :: sorted     ! Flag: the site is already sorted
       !------------------------------------------------------------------------------------!
-      
+
       !----- No need to sort a site with a single patch. ----------------------------------!
       if (csite%npatches < 2) return
 
@@ -2943,18 +2991,18 @@ module fuse_fiss_utils
       nullify (tempsite)
       allocate(tempsite)
       call allocate_sitetype(tempsite,csite%npatches)
-      
+
       ipa = 0
       !---- Loop until all patches were sorted. -------------------------------------------!
       do while (ipa < csite%npatches)
          ipa = ipa + 1
-      
+
          !----- Find the oldest site. -----------------------------------------------------!
          oldpa = maxloc(csite%age,dim=1)
-         
+
          !----- Copy to patch the scratch structure. --------------------------------------!
          call copy_sitetype(csite,tempsite,oldpa,oldpa,ipa,ipa)
-         
+
          !----- Put a non-sense age so this patch will never "win" again. -----------------!
          csite%age(oldpa) = -huge(1.)
       end do
@@ -2981,7 +3029,7 @@ module fuse_fiss_utils
 
    !=======================================================================================!
    !=======================================================================================!
-   !  SUBROUTINE: FUSE_PATCHES  
+   !  SUBROUTINE: FUSE_PATCHES
    !> \brief This subroutine will perform patch fusion based on some similarity
    !> criteria to determine whether they can be fused with no significant loss of
    !> information.
@@ -3100,8 +3148,8 @@ module fuse_fiss_utils
                   open (unit=72,file=trim(fuse_fout),status='replace',action='write')
                   write(unit=72,fmt='(a)')       '----------------------------------------'
                   write(unit=72,fmt='(a)')       ' Patch Fusion log for: '
-                  write(unit=72,fmt='(a,1x,i5)') ' POLYGON: ',jpy 
-                  write(unit=72,fmt='(a,1x,i5)') ' SITE:    ',jsi 
+                  write(unit=72,fmt='(a,1x,i5)') ' POLYGON: ',jpy
+                  write(unit=72,fmt='(a,1x,i5)') ' SITE:    ',jsi
                   write(unit=72,fmt='(a)')       '----------------------------------------'
                   write(unit=72,fmt='(a)')       ' '
                   close(unit=72,status='keep')
@@ -3128,7 +3176,7 @@ module fuse_fiss_utils
 
       polyloop: do ipy = 1,cgrid%npolygons
          cpoly => cgrid%polygon(ipy)
-         
+
          siteloop: do isi = 1,cpoly%nsites
             csite => cpoly%site(isi)
 
@@ -3225,7 +3273,7 @@ module fuse_fiss_utils
             donloope: do donp=csite%npatches,2,-1
                donpatch => csite%patch(donp)
                don_lu = csite%dist_type(donp)
-               
+
                !----- If patch is not empty, or has already been fused, move on. ----------!
                if ( (.not. fuse_table(donp)) .or.                                          &
                     ( dont_force_fuse .and.  donpatch%ncohorts > 0) ) then
@@ -3368,7 +3416,7 @@ module fuse_fiss_utils
                   donloopa: do donp=csite%npatches,2,-1
                      donpatch => csite%patch(donp)
                      don_lu = csite%dist_type(donp)
-                     
+
                      !----- If patch is not empty, or has already been fused, move on. ----!
                      if ( (.not. fuse_table(donp)) .or.                                    &
                           ( dont_force_fuse .and. donpatch%ncohorts == 0 ) ) then
@@ -3461,7 +3509,7 @@ module fuse_fiss_utils
 
 
 
-                           
+
                            !---------------------------------------------------------------!
                            !    Check whether these bins contain some LAI.  Bins that have !
                            ! tiny cumulative LAI may differ by a lot in the relative       !
@@ -3507,7 +3555,7 @@ module fuse_fiss_utils
                            !---------------------------------------------------------------!
                            llevel_donp = exp(- 0.5 * cumlai_donp)
                            llevel_recp = exp(- 0.5 * cumlai_recp)
-                           
+
                            diff = abs(llevel_donp - llevel_recp )
                            refv =    (llevel_donp + llevel_recp ) * 0.5
                            norm = diff / refv
@@ -3730,7 +3778,7 @@ module fuse_fiss_utils
                         exit recloopp
                      end if
                   end do recloopp
-                 
+
                   if (.not. recp_found) then
                      if (print_fuse_details) then
                         open  (unit=72,file=trim(fuse_fout),status='old',action='write'    &
@@ -3808,7 +3856,7 @@ module fuse_fiss_utils
                      end if
                      !---------------------------------------------------------------------!
 
-                     
+
                      !---------------------------------------------------------------------!
                      !    Check whether these bins contain some LAI.  Bins that have       !
                      ! tiny cumulative LAI may differ by a lot in the relative scale,      !
@@ -3851,7 +3899,7 @@ module fuse_fiss_utils
                      !---------------------------------------------------------------------!
                      llevel_donp = exp(- 0.5 * cumlai_donp)
                      llevel_recp = exp(- 0.5 * cumlai_recp)
-                     
+
                      diff = abs(llevel_donp - llevel_recp )
                      refv =    (llevel_donp + llevel_recp ) * 0.5
                      norm = diff / refv
@@ -3886,7 +3934,7 @@ module fuse_fiss_utils
                   end do hgtloop
                   !------------------------------------------------------------------------!
 
-                 
+
 
                   !------------------------------------------------------------------------!
                   !      Reaching this point means that the patches are sufficiently       !
@@ -3900,7 +3948,7 @@ module fuse_fiss_utils
                                      ,elim_nplant,elim_lai)
                   !------------------------------------------------------------------------!
 
-                  
+
 
                   !----- Record the fusion if requested by the user. ----------------------!
                   if (print_fuse_details) then
@@ -4070,7 +4118,7 @@ module fuse_fiss_utils
                               &,'fuse_patches','fuse_fiss_utils.f90')
             end if
             !------------------------------------------------------------------------------!
-            
+
          end do siteloop
       end do polyloop
 
@@ -4083,7 +4131,7 @@ module fuse_fiss_utils
       tot_nsites    = 0
       do ipy=1,cgrid%npolygons
          cpoly => cgrid%polygon(ipy)
-         tot_nsites = tot_nsites + cpoly%nsites 
+         tot_nsites = tot_nsites + cpoly%nsites
          do isi=1,cpoly%nsites
             csite => cpoly%site(isi)
             tot_npatches = tot_npatches + csite%npatches
@@ -4110,14 +4158,14 @@ module fuse_fiss_utils
 
    !=======================================================================================!
    !=======================================================================================!
-   !  SUBROUTINE: FUSE_2_PATCHES  
+   !  SUBROUTINE: FUSE_2_PATCHES
    !> \brief This subroutine will merge two patches into 1.
    !---------------------------------------------------------------------------------------!
    subroutine fuse_2_patches(csite,donp,recp,mzg,mzs,lsl,ntext_soil,green_leaf_factor &
                             ,fuse_initial,elim_nplant,elim_lai)
       use update_derived_props_module
       use patch_pft_size_profile_mod
-      use ed_state_vars      , only : sitetype              & ! Structure 
+      use ed_state_vars      , only : sitetype              & ! Structure
                                     , patchtype             ! ! Structure
       use soil_coms          , only : soil                  & ! intent(in), lookup table
                                     , tiny_sfcwater_mass    & ! intent(in)
@@ -4148,7 +4196,7 @@ module fuse_fiss_utils
       integer, dimension(mzg), intent(in)  :: ntext_soil        ! Soil type
       real, dimension(n_pft) , intent(in)  :: green_leaf_factor ! Green leaf factor...
       logical                , intent(in)  :: fuse_initial      ! Initialisation?
-      real                   , intent(out) :: elim_nplant       ! Eliminated nplant 
+      real                   , intent(out) :: elim_nplant       ! Eliminated nplant
       real                   , intent(out) :: elim_lai          ! Eliminated lai
       !----- Local variables --------------------------------------------------------------!
       type(patchtype)        , pointer     :: cpatch            ! Current patch
@@ -4163,14 +4211,14 @@ module fuse_fiss_utils
       real                                 :: newareai          ! 1./(new patch area)
       real                                 :: area_scale        ! Cohort rescaling factor.
       !------------------------------------------------------------------------------------!
-     
+
       !------------------------------------------------------------------------------------!
       !     This function fuses the two patches specified in the argument. It fuses the    !
       ! first patch in the argument (the "donor" = donp ) into the second patch in the     !
       ! argument (the "recipient" = recp ), and frees the memory associated with the donor !
       ! patch.                                                                             !
       !------------------------------------------------------------------------------------!
-    
+
       !----- The new area is simply the sum of each patch area. ---------------------------!
       newarea  = csite%area(donp) + csite%area(recp)
       newareai = 1.0/newarea
@@ -4209,12 +4257,12 @@ module fuse_fiss_utils
       csite%structural_soil_C(recp)  = newareai *                                          &
                                      ( csite%structural_soil_C(donp)  * csite%area(donp)   &
                                      + csite%structural_soil_C(recp)  * csite%area(recp) )
-                                     
+
 
       csite%structural_soil_L(recp)  = newareai *                                          &
                                      ( csite%structural_soil_L(donp)  * csite%area(donp)   &
                                      + csite%structural_soil_L(recp)  * csite%area(recp) )
-                                     
+
 
       csite%mineralized_soil_N(recp) = newareai *                                          &
                                      ( csite%mineralized_soil_N(donp) * csite%area(donp)   &
@@ -4276,7 +4324,7 @@ module fuse_fiss_utils
                                      ( csite%ggsoil(donp)             * csite%area(donp)   &
                                      + csite%ggsoil(recp)             * csite%area(recp) )
 
-      
+
       !------------------------------------------------------------------------------------!
       !    There is no guarantee that there will be a minimum amount of mass in the tempo- !
       ! rary layer, nor is there any reason for both patches to have the same number of    !
@@ -4340,7 +4388,7 @@ module fuse_fiss_utils
       !    (Both are done in new_patch_sfc_props).                                         !
       !------------------------------------------------------------------------------------!
       !------------------------------------------------------------------------------------!
-     
+
 
       !----- Merge soil energy and water. -------------------------------------------------!
       do iii=1,mzg
@@ -4377,7 +4425,7 @@ module fuse_fiss_utils
       !------------------------------------------------------------------------------------!
 
 
-      
+
 
       !------------------------------------------------------------------------------------!
       !    This subroutine takes care of filling:                                          !
@@ -4412,7 +4460,7 @@ module fuse_fiss_utils
       !------------------------------------------------------------------------------------!
 
 
- 
+
 
 
       !------------------------------------------------------------------------------------!
@@ -4765,7 +4813,7 @@ module fuse_fiss_utils
                                                  *   newareai
          !---------------------------------------------------------------------------------!
 
-        
+
          !---------------------------------------------------------------------------------!
          !      Now we find the derived properties for the canopy air space.               !
          !---------------------------------------------------------------------------------!
@@ -4839,9 +4887,9 @@ module fuse_fiss_utils
 
 
 
-      !------------------------------------------------------------------------------------! 
+      !------------------------------------------------------------------------------------!
       !    Daily means.                                                                    !
-      !------------------------------------------------------------------------------------! 
+      !------------------------------------------------------------------------------------!
       if (writing_long .and.  (.not. fuse_initial) ) then
         if ( all(csite%dmean_can_prss > 10.0) ) then
          csite%dmean_A_decomp           (recp) = ( csite%dmean_A_decomp           (recp)   &
@@ -5169,9 +5217,9 @@ module fuse_fiss_utils
       end if
       !------------------------------------------------------------------------------------!
 
-      !------------------------------------------------------------------------------------! 
+      !------------------------------------------------------------------------------------!
       !    Monthly means.                                                                  !
-      !------------------------------------------------------------------------------------! 
+      !------------------------------------------------------------------------------------!
       if (writing_eorq .and. (.not. fuse_initial)) then
         if( all(csite%mmean_can_prss > 10.0) ) then
 
@@ -5293,7 +5341,7 @@ module fuse_fiss_utils
                                                   , csite%mmsqu_sensible_ac(donp)          &
                                                   , csite%area             (donp)          &
                                                   , corr_patch, .false.)
-         !---------------------------------------------------------------------------------! 
+         !---------------------------------------------------------------------------------!
 
 
          csite%mmean_rh                 (recp) = ( csite%mmean_rh                 (recp)   &
@@ -5654,9 +5702,9 @@ module fuse_fiss_utils
 
 
 
-      !------------------------------------------------------------------------------------! 
+      !------------------------------------------------------------------------------------!
       !    Mean diel.                                                                      !
-      !------------------------------------------------------------------------------------! 
+      !------------------------------------------------------------------------------------!
       if (writing_dcyc .and. (.not. fuse_initial)) then
         if( all(csite%qmean_can_prss > 10.0) ) then
          !---------------------------------------------------------------------------------!
@@ -6184,7 +6232,7 @@ module fuse_fiss_utils
 
    !=======================================================================================!
    !=======================================================================================!
-   !  SUBROUTINE: FUSE_MSQU       
+   !  SUBROUTINE: FUSE_MSQU
    !> \brief This subroutine combines the mean sum of squares of two quantities (x and y).
    !                                                                                       !
    ! xmean, ymean -- the mean values of x and y                                            !
@@ -6258,9 +6306,3 @@ module fuse_fiss_utils
 end module fuse_fiss_utils
 !==========================================================================================!
 !==========================================================================================!
-
-
-
-
-
-
