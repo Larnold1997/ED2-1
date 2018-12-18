@@ -970,6 +970,7 @@ subroutine update_met_drivers(cgrid)
             !----- Find which variable it is, and then fill the polygons. -----------------!
             select case (trim(met_vars(iformat,iv)))
             case('nbdsf')   !----- Near IR beam downward shortwave flux. ------ [   W/m�] -!
+
                !---------------------------------------------------------------------------!
                !    Decide whether to interpolate or not.                                  !
                !---------------------------------------------------------------------------!
@@ -1808,15 +1809,12 @@ subroutine update_met_drivers(cgrid)
                            cgrid%met(ipy)%nir_beam = fperp_prev * cgrid%cosz(ipy)
                         else
                            !----- Middle of the day, use both previous and next values. ---!
-                           fperp_next = cgrid%metinput(ipy)%nbdsf(mnext)
-                           fperp_prev = cgrid%metinput(ipy)%nbdsf(mprev)
-                           cgrid%met(ipy)%nir_beam = 1                          &
+                           fperp_next = cgrid%metinput(ipy)%nbdsf(mnext) * secz_next
+                           fperp_prev = cgrid%metinput(ipy)%nbdsf(mprev) * secz_prev
+                           cgrid%met(ipy)%nir_beam = cgrid%cosz(ipy)                          &
                                                    * ( fperp_next * wnext                     &
                                                      + fperp_prev * wprev )
-                        
-	
-			end if
-			
+                        end if
                         !------------------------------------------------------------------!
                      else
                         !----- Night time, assign it zero. --------------------------------!
