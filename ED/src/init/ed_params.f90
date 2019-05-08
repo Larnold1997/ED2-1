@@ -397,7 +397,7 @@ subroutine init_met_params()
 
    !----- Minimum and maximum acceptable shortwave radiation [W/m�]. ----------------------!
    rshort_min  = 0.
-   rshort_max  = 1500.
+   rshort_max  = 1600.
    !----- Minimum and maximum acceptable longwave radiation [W/m�]. -----------------------!
    rlong_min   = 40.
    rlong_max   = 600.
@@ -406,7 +406,7 @@ subroutine init_met_params()
    atm_tmp_max = 331.     ! Highest temperature ever measured, in El Azizia, Libya
    !----- Minimum and maximum acceptable air specific humidity [kg_H2O/kg_air]. -----------!
    atm_shv_min = 1.e-6    ! That corresponds to a relative humidity of 0.1% at 1000hPa
-   atm_shv_max = 3.2e-2   ! That corresponds to a dew point of 32�C at 1000hPa.
+   atm_shv_max = 10.2e-2   ! That corresponds to a dew point of 32�C at 1000hPa.
    !----- Minimum and maximum acceptable CO2 mixing ratio [�mol/mol]. ---------------------!
    atm_co2_min = 100.     !
    atm_co2_max = 1100.    !
@@ -2447,7 +2447,7 @@ subroutine init_pft_alloc_params()
    ! used only for branch area purposes.                                                   !
    !---------------------------------------------------------------------------------------!
    !---- [KIM] new tropical parameters. ---------------------------------------------------!
-   rho(1)     = 0.20   ! 0.40
+   rho(1)     = 0.40   ! was 0.2, switched to try to get simulation to produce reasonable resuts
    rho(2)     = 0.53   ! 0.40
    rho(3)     = 0.71   ! 0.60
    rho(4)     = 0.90   ! 0.87
@@ -4659,6 +4659,8 @@ subroutine init_soil_coms
 
 
 
+
+
    !---------------------------------------------------------------------------------------!
    !     Parameters for fraction covered with snow, which is based on:                     !
    !                                                                                       !
@@ -4798,6 +4800,13 @@ subroutine init_soil_coms
       ,        0.000,        0.000,        0.000,     0.000              )      &
       /)
    !---------------------------------------------------------------------------------------!
+
+   !Adding to try to get correct soil water
+   do nsoil = 1, 12
+   	soil(nsoil)%soilcp = 0.01 !0.1 - 0.07 * soil(nsoil)%xsand
+   	soil(nsoil)%xsilt = 1.0 - soil(nsoil)%xsand - soil(nsoil)%xclay
+   enddo
+
 
 
 
