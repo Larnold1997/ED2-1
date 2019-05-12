@@ -102,7 +102,7 @@ rain.daily = rep(0,nfile/24)
 day = 1
 
 i = 1
-while(i < ncol(soil_water)){
+while(i < ncol(rain)){
   rain.daily[day] = mean(rain[i:(i+23)])*86400 #average rate across the day times seconds in a day
   day = day + 1
   i = i + 24
